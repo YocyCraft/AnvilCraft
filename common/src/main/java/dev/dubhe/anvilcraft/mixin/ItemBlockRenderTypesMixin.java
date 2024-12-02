@@ -20,5 +20,6 @@ public class ItemBlockRenderTypesMixin {
         map.put(ModBlocks.HEAVY_IRON_WALL.get(), RenderType.cutout());
         map.put(ModBlocks.HEAVY_IRON_DOOR.get(), RenderType.cutout());
         map.put(ModBlocks.HEAVY_IRON_TRAPDOOR.get(), RenderType.cutout());
+        map.put(ModBlocks.BATCH_CRAFTER.get(), RenderType.cutout());
     }
 }

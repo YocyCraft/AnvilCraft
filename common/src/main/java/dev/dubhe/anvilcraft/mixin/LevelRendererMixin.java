@@ -2,6 +2,7 @@ package dev.dubhe.anvilcraft.mixin;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import dev.dubhe.anvilcraft.api.hammer.IHasHammerEffect;
 import dev.dubhe.anvilcraft.api.tooltip.HudTooltipManager;
 import dev.dubhe.anvilcraft.client.renderer.PowerGridRenderer;
 import dev.dubhe.anvilcraft.item.IEngineerGoggles;
@@ -15,6 +16,9 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderBuffers;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.block.ModelBlockRenderer;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.InteractionHand;
@@ -22,6 +26,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -112,5 +117,57 @@ abstract class LevelRendererMixin {
                 camZ
             );
         }
+    }
+
+    @Inject(
+        method = "renderLevel",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/renderer/LevelRenderer;"
+                + "checkPoseStack(Lcom/mojang/blaze3d/vertex/PoseStack;)V",
+            ordinal = 1
+        )
+    )
+    void renderHammerEffect(
+        PoseStack poseStack,
+        float partialTick,
+        long finishNanoTime,
+        boolean renderBlockOutline,
+        Camera camera,
+        GameRenderer gameRenderer,
+        LightTexture lightTexture,
+        Matrix4f projectionMatrix,
+        CallbackInfo ci
+    ) {
+        Minecraft mc = Minecraft.getInstance();
+        if (!(mc.screen instanceof IHasHammerEffect hasHammerEffect)) return;
+        if (!hasHammerEffect.shouldRender()) return;
+        BlockPos pos = hasHammerEffect.renderingBlockPos();
+        BlockState state = hasHammerEffect.renderingBlockState();
+        RenderType renderType = hasHammerEffect.renderType();
+        poseStack.pushPose();
+        Vec3 cameraPos = camera.getPosition();
+        poseStack.translate(
+            pos.getX() - cameraPos.x - 0.0005,
+            pos.getY() - cameraPos.y - 0.0005,
+            pos.getZ() - cameraPos.z - 0.0005
+        );
+        poseStack.scale(1.001f, 1.001f, 1.001f);
+        BakedModel model = mc.getBlockRenderer().getBlockModel(state);
+        ModelBlockRenderer renderer = mc.getBlockRenderer().getModelRenderer();
+        MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
+        VertexConsumer vertexConsumer = bufferSource.getBuffer(renderType);
+        renderer.renderModel(
+            poseStack.last(),
+            vertexConsumer,
+            state,
+            model,
+            1f,
+            1f,
+            1f,
+            LightTexture.FULL_BLOCK,
+            OverlayTexture.NO_OVERLAY
+        );
+        poseStack.popPose();
     }
 }

@@ -62,26 +62,7 @@ public class BatchCrafterRenderer implements BlockEntityRenderer<BatchCrafterBlo
             int packedLight,
             int packedOverlay
     ) {
-        BlockState state = blockEntity.getBlockState();
-        BakedModel blockModel = blockRenderDispatcher.getBlockModel(state);
         Level level = blockEntity.getLevel();
-        int packed = LightTexture.FULL_BLOCK;
-        if (level != null) {
-            int skyLight = level.getBrightness(LightLayer.SKY, blockEntity.getBlockPos());
-            int blockLight = level.getBrightness(LightLayer.BLOCK, blockEntity.getBlockPos());
-            packed = LightTexture.pack(blockLight, skyLight);
-        }
-        blockRenderDispatcher.getModelRenderer().renderModel(
-                poseStack.last(),
-                buffer.getBuffer(RenderType.cutout()),
-                state,
-                blockModel,
-                0,
-                0,
-                0,
-                packed,
-                OverlayTexture.NO_OVERLAY
-        );
         ItemStack itemStack = blockEntity.getDisplayItemStack();
         if (itemStack == null || itemStack.isEmpty()) return;
         int seed = itemStack.isEmpty() ? 187 : Item.getId(itemStack.getItem()) + itemStack.getDamageValue();

@@ -191,7 +191,7 @@ public class BatchCrafterBlock extends BaseEntityBlock implements IHammerChangea
 
     @Override
     public @NotNull RenderShape getRenderShape(@NotNull BlockState state) {
-        return RenderShape.INVISIBLE;
+        return RenderShape.MODEL;
     }
 
     @Override

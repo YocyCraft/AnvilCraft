@@ -43,6 +43,7 @@
     "ItemBlockRenderTypesMixin",
     "ItemInHandRendererMixin",
     "LevelRendererMixin",
+    "MouseHandlerMixin",
     "SoundEngineMixin",
     "TooltipRenderMixin",
     "accessor.ItemInHandRendererAccessor",
