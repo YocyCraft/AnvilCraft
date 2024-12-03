@@ -32,9 +32,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+
+import static dev.dubhe.anvilcraft.api.hammer.IHammerChangeableBlock.FACING;
+import static dev.dubhe.anvilcraft.api.hammer.IHammerChangeableBlock.FACING_HOPPER;
+import static dev.dubhe.anvilcraft.api.hammer.IHammerChangeableBlock.HORIZONTAL_FACING;
 
 public class AnvilHammerItem extends Item implements Vanishable, Equipable, IEngineerGoggles {
     private static long lastDropAnvilTime = 0;
@@ -101,6 +106,35 @@ public class AnvilHammerItem extends Item implements Vanishable, Equipable, IEng
                 || state.is(ModBlockTags.HAMMER_REMOVABLE)
                 || state.is(ModBlockTags.HAMMER_CHANGEABLE)
                 || player.getOffhandItem().is(Items.FIREWORK_ROCKET);
+    }
+
+    /**
+     * 从方块状态中试图获取可被铁砧锤修改的属性
+     */
+    public static Property<?> findChangeableProperty(BlockState state) {
+        Property<?> result = null;
+        if (state.getBlock() instanceof IHammerChangeable changeable) {
+            result = changeable.getChangeableProperty(state);
+        }
+        if (result != null) {
+            return result;
+        }
+        if (state.hasProperty(FACING)) {
+            return FACING;
+        } else {
+            if (state.hasProperty(FACING_HOPPER)) {
+                return FACING_HOPPER;
+            } else {
+                if (state.hasProperty(HORIZONTAL_FACING)) {
+                    return HORIZONTAL_FACING;
+                }
+            }
+        }
+        return null;
+    }
+
+    public static boolean possibleToUseEnhancedHammerChange(BlockState state) {
+        return state.getBlock() instanceof IHammerChangeable || state.is(ModBlockTags.HAMMER_CHANGEABLE);
     }
 
     private static void dropAnvil(Player player, Level level, BlockPos blockPos) {

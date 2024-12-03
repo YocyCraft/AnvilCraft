@@ -1,5 +1,7 @@
 package dev.dubhe.anvilcraft.event.fabric;
 
+import net.minecraft.client.Minecraft;
+
 public class ModFabricEventsListener {
     /**
      * 初始化
@@ -14,5 +16,12 @@ public class ModFabricEventsListener {
         CommandEventListener.init();
         ServerWorldEventListener.init();
         CommonEventHandlerListener.serverInit();
+        try {
+            Minecraft.getInstance();
+            RenderEventListener.init();
+        } catch (Throwable e) {
+            //intentially empty
+        }
+
     }
 }

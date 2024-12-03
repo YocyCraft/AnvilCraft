@@ -8,6 +8,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.Property;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -62,5 +63,21 @@ public interface IHammerChangeableBlock extends IHammerChangeable {
     @SuppressWarnings("SameParameterValue")
     private static @NotNull BlockState horizontalRotate(@NotNull BlockState state) {
         return state.setValue(HORIZONTAL_FACING, state.getValue(HORIZONTAL_FACING).getClockWise());
+    }
+
+    @Override
+    default Property<?> getChangeableProperty(BlockState state) {
+        if (state.hasProperty(FACING)) {
+            return FACING;
+        } else {
+            if (state.hasProperty(FACING_HOPPER)) {
+                return FACING_HOPPER;
+            } else {
+                if (state.hasProperty(HORIZONTAL_FACING)) {
+                    return HORIZONTAL_FACING;
+                }
+            }
+        }
+        return null;
     }
 }
