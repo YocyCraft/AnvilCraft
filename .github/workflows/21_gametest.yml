@@ -1,9 +1,10 @@
-name: Pull Request GameTest
+name: GameTest for AnvilCraftMod 1.21.1+
 on: workflow_call
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -11,11 +12,18 @@ jobs:
       - name: validate gradle wrapper
         uses: gradle/actions/wrapper-validation@v3
 
-      - name: Setup Java 17
+      - name: Read Properties
+        id: 'properties'
+        uses: christian-draeger/read-properties@1.1.1
+        with:
+          path: gradle.properties
+          properties: 'java_version'
+
+      - name: Setup Java ${{ steps.properties.outputs.java_version }}
         uses: actions/setup-java@v3.6.0
         with:
           distribution: zulu
-          java-version: 17
+          java-version: ${{ steps.properties.outputs.java_version }}
 
       - name: make gradle wrapper executable
         if: ${{ runner.os != 'Windows' }}
@@ -24,8 +32,5 @@ jobs:
       - name: Build with Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Run Fabric GameTest
-        run: ./gradlew anvilcraft-fabric:runGameTestServer
-
-      - name: Run Forge GameTest
-        run: ./gradlew anvilcraft-forge:runGameTestServer
+      - name: Run GameTest
+        run: ./gradlew runGameTestServer
