@@ -8,6 +8,7 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import dev.dubhe.anvilcraft.AnvilCraft;
 import dev.dubhe.anvilcraft.api.hammer.IHasHammerEffect;
 import dev.dubhe.anvilcraft.api.input.IMouseHandlerExtension;
 import dev.dubhe.anvilcraft.client.init.ModRenderTypes;
@@ -31,7 +32,9 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @ParametersAreNonnullByDefault
 public class AnvilHammerScreen extends Screen implements IHasHammerEffect {
@@ -41,7 +44,11 @@ public class AnvilHammerScreen extends Screen implements IHasHammerEffect {
     public static final int CLOSING_ANIMATION_T = 150;  //ms
     public static final float ZOOM = 13.5f;
     public static final int IGNORE_CURSOR_MOVE_LENGTH = 15;
-
+    private static final String[] ALL_GETNAME_METHODS = {
+        "getName",
+        "method_11901",
+        "m_6940_"
+    };
     private static final MethodHandle PROPERTY_TOSTRING;
 
     private static final int RING_COLOR = 0x88000000;
@@ -59,16 +66,21 @@ public class AnvilHammerScreen extends Screen implements IHasHammerEffect {
             String.class,
             Comparable.class
         );
-        try {
-            PROPERTY_TOSTRING = MethodHandles.lookup()
-                .findVirtual(
-                    Property.class,
-                    "getName",
-                    mt
-                );
-        } catch (NoSuchMethodException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        PROPERTY_TOSTRING = Arrays.stream(ALL_GETNAME_METHODS)
+            .map(it -> {
+                try {
+                    return MethodHandles.lookup()
+                        .findVirtual(
+                            Property.class,
+                            it,
+                            mt
+                        );
+                } catch (Exception e) {
+                    return null;
+                }
+            }).filter(Objects::nonNull)
+            .findFirst()
+            .orElseThrow();
     }
 
     private final Minecraft minecraft = Minecraft.getInstance();
