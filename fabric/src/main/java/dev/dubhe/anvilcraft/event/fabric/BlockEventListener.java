@@ -3,6 +3,7 @@ package dev.dubhe.anvilcraft.event.fabric;
 import dev.dubhe.anvilcraft.api.hammer.IHammerChangeable;
 import dev.dubhe.anvilcraft.api.hammer.IHammerRemovable;
 import dev.dubhe.anvilcraft.client.gui.screen.inventory.AnvilHammerScreen;
+import dev.dubhe.anvilcraft.init.ModBlockTags;
 import dev.dubhe.anvilcraft.item.AnvilHammerItem;
 import dev.dubhe.anvilcraft.network.HammerUsePack;
 import dev.dubhe.anvilcraft.util.StateUtil;
@@ -80,8 +81,8 @@ public class BlockEventListener {
             && AnvilHammerItem.possibleToUseEnhancedHammerChange(targetBlockState)
             && property != null
         ) {
-            if (targetBlockState.getBlock() instanceof IHammerChangeable ihc
-                && ihc.checkBlockState(targetBlockState)
+            if ((targetBlockState.getBlock() instanceof IHammerChangeable ihc
+                && ihc.checkBlockState(targetBlockState)) || (targetBlockState.is(ModBlockTags.HAMMER_CHANGEABLE))
                 && player.getAbilities().mayBuild
             ) {
                 List<BlockState> possibleStates = StateUtil.findPossibleStatesForProperty(targetBlockState, property);

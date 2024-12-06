@@ -6,7 +6,6 @@ uniform vec4 ColorModulator;
 uniform vec2 FramebufferSize;
 uniform vec2 Center;
 uniform float Radius;
-uniform float AntiAliasingRadius;
 
 out vec4 fragColor;
 
@@ -16,7 +15,7 @@ void main() {
     vec4 color = vec4(0, 0, 0, 0);
     if (distance <= Radius) {
         color = vertexColor;
-        color.a = smoothstep(Radius, 0f, distance);
+        color.a = smoothstep(Radius, 0.0f, distance);
     }
 
     fragColor = color * ColorModulator;
