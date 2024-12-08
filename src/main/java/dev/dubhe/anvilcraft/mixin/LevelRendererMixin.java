@@ -2,6 +2,8 @@ package dev.dubhe.anvilcraft.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.pipeline.RenderTarget;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.dubhe.anvilcraft.client.init.ModRenderTargets;
 import dev.dubhe.anvilcraft.client.init.ModRenderTypes;
@@ -130,6 +132,7 @@ public abstract class LevelRendererMixin {
     ) {
         if (!RenderState.isEnhancedRenderingAvailable()) return;
         if (!RenderState.isBloomEffectEnabled()) return;
+
         RenderTarget mcInput = ModShaders.getBloomChain().getTempTarget("mcinput");
         mcInput.setClearColor(
             FogRenderer.fogRed,
@@ -138,7 +141,12 @@ public abstract class LevelRendererMixin {
             0f
         );
         mcInput.clear(Minecraft.ON_OSX);
+        int oldTexture = GlStateManager._getActiveTexture();
+        ModRenderTargets.getTempTarget().copyDepthFrom(Minecraft.getInstance().getMainRenderTarget());
         ModShaders.getBloomChain().process(RenderHelper.getPartialTick());
+        Minecraft.getInstance().getMainRenderTarget().copyDepthFrom(ModRenderTargets.getTempTarget());
+        RenderSystem.activeTexture(oldTexture);
+        RenderSystem.enableDepthTest();
         minecraft.getMainRenderTarget().bindWrite(false);
     }
 
