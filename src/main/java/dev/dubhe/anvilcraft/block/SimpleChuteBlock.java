@@ -110,7 +110,8 @@ public class SimpleChuteBlock
         BlockPos pos,
         Block neighborBlock,
         BlockPos neighborPos,
-        boolean movedByPiston) {
+        boolean movedByPiston
+    ) {
         if (level.isClientSide) return;
         boolean bl = state.getValue(ENABLED);
         if (bl == level.hasNeighborSignal(pos)) {
@@ -124,7 +125,7 @@ public class SimpleChuteBlock
             || blockState.is(ModBlocks.SIMPLE_CHUTE.get())
         ) {
             Direction neighbourFacing;
-            if (neighborBlock == ModBlocks.MAGNETIC_CHUTE.get()) {
+            if (blockState.is(ModBlocks.MAGNETIC_CHUTE.get())) {
                 neighbourFacing = blockState.getValue(MagneticChuteBlock.FACING);
             } else {
                 neighbourFacing = blockState.getValue(FACING);
